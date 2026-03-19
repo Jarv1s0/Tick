@@ -63,11 +63,6 @@ npm run tauri build
 - NSIS 安装包目录：[build-output/release/bundle/nsis](./build-output/release/bundle/nsis)
 - MSI 安装包目录：[build-output/release/bundle/msi](./build-output/release/bundle/msi)
 
-当前仓库中已经存在过的示例产物包括：
-
-- [Tick_0.2.0_x64-setup.exe](./build-output/release/bundle/nsis/Tick_0.2.0_x64-setup.exe)
-- [Tick_0.2.0_x64_en-US.msi](./build-output/release/bundle/msi/Tick_0.2.0_x64_en-US.msi)
-
 ## 构建产物位置总览
 
 | 场景 | 命令 | 产物位置 |
@@ -95,28 +90,6 @@ Tick/
 - [scripts/run-tauri.mjs](./scripts/run-tauri.mjs) 会在构建成功后把最终成品同步到 `build-output/release`
 - 当前 Tauri 配置启用了 `bundle.active: true`
 - 当前 Tauri 配置的 `bundle.targets` 为 `all`
-
-## 常见说明
-
-### 为什么执行 `npm run tauri build` 后会同时看到多个目录？
-
-因为当前配置启用了：
-
-- `bundle.active = true`
-- `bundle.targets = all`
-
-所以一次构建可能同时生成：
-
-- 原生 `exe`
-- `nsis` 安装包
-- `msi` 安装包
-
-### 为什么没有 `portable` 绿色版命令？
-
-当前这个项目的 Tauri CLI 在 Windows 下 `--bundles` 只支持：
-
-- `nsis`
-- `msi`
 
 ## 版本信息
 

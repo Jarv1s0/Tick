@@ -1,0 +1,83 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Read app version
+        id: app_meta
+        shell: pwsh
+        run: |
+          $config = Get-Content "src-tauri/tauri.conf.json" | ConvertFrom-Json
+          $version = $config.version
+          $productName = $config.productName
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "product_name=$productName" >> $env:GITHUB_OUTPUT
+          "release_tag=v$version" >> $env:GITHUB_OUTPUT
+          "release_name=$productName v$version" >> $env:GITHUB_OUTPUT
+
+      - name: Build desktop release
+        run: npm run tauri build
+
+      - name: Verify release assets
+        shell: pwsh
+        run: |
+          $version = "${{ steps.app_meta.outputs.version }}"
+          $productName = "${{ steps.app_meta.outputs.product_name }}"
+          $exe = "build-output/release/${productName}_${version}.exe"
+          $nsis = Get-ChildItem "build-output/release/bundle/nsis/*.exe" -ErrorAction Stop | Select-Object -First 1
+          $msi = Get-ChildItem "build-output/release/bundle/msi/*.msi" -ErrorAction Stop | Select-Object -First 1
+          if (!(Test-Path $exe)) { throw "Missing exe asset: $exe" }
+          if (!$nsis) { throw "Missing NSIS asset" }
+          if (!$msi) { throw "Missing MSI asset" }
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-release-${{ steps.app_meta.outputs.version }}
+          path: |
+            build-output/release/*.exe
+            build-output/release/bundle/nsis/*.exe
+            build-output/release/bundle/msi/*.msi
+          if-no-files-found: error
+
+      - name: Publish GitHub Release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ steps.app_meta.outputs.release_tag }}
+          name: ${{ steps.app_meta.outputs.release_name }}
+          allowUpdates: true
+          replacesArtifacts: true
+          removeArtifacts: true
+          artifactErrorsFailBuild: true
+          artifacts: |
+            build-output/release/*.exe
+            build-output/release/bundle/nsis/*.exe
+            build-output/release/bundle/msi/*.msi
+          body: |
+            自动构建发布产物：
+            - 带版本号的桌面可执行文件
+            - NSIS 安装包
+            - MSI 安装包
