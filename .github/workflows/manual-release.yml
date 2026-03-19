@@ -2,6 +2,11 @@ name: Manual Release
 
 on:
   workflow_dispatch:
+    inputs:
+      release_notes:
+        description: 更新日志（可选，支持多行）
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -41,6 +46,31 @@ jobs:
       - name: Build desktop release
         run: npm run tauri build
 
+      - name: Prepare release notes
+        id: release_notes
+        shell: pwsh
+        run: |
+          $notes = @'
+          ${{ github.event.inputs.release_notes }}
+          '@.Trim()
+
+          $bodyLines = @(
+            "自动构建发布产物：",
+            "- 带版本号的桌面可执行文件",
+            "- NSIS 安装包",
+            "- MSI 安装包"
+          )
+
+          if ($notes) {
+            $bodyLines += ""
+            $bodyLines += "更新日志："
+            $bodyLines += $notes
+          }
+
+          $bodyPath = Join-Path $env:RUNNER_TEMP "release-body.md"
+          Set-Content -Path $bodyPath -Value ($bodyLines -join [Environment]::NewLine) -Encoding UTF8
+          "body_path=$bodyPath" >> $env:GITHUB_OUTPUT
+
       - name: Verify release assets
         shell: pwsh
         run: |
@@ -76,8 +106,4 @@ jobs:
             build-output/release/*.exe
             build-output/release/bundle/nsis/*.exe
             build-output/release/bundle/msi/*.msi
-          body: |
-            自动构建发布产物：
-            - 带版本号的桌面可执行文件
-            - NSIS 安装包
-            - MSI 安装包
+          bodyFile: ${{ steps.release_notes.outputs.body_path }}
