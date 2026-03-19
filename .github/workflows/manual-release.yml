@@ -76,7 +76,7 @@ jobs:
         run: |
           $version = "${{ steps.app_meta.outputs.version }}"
           $productName = "${{ steps.app_meta.outputs.product_name }}"
-          $exe = "build-output/release/${productName}_${version}.exe"
+          $exe = "build-output/release/${productName}_${version}-Portable.exe"
           $nsis = Get-ChildItem "build-output/release/bundle/nsis/*.exe" -ErrorAction Stop | Select-Object -First 1
           $msi = Get-ChildItem "build-output/release/bundle/msi/*.msi" -ErrorAction Stop | Select-Object -First 1
           if (!(Test-Path $exe)) { throw "Missing exe asset: $exe" }
