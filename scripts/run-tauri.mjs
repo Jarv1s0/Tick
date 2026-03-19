@@ -22,7 +22,7 @@ const appVersion = tauriConfig.version || "0.0.0";
 const releaseSourceDir = resolve(projectRoot, "src-tauri", "target", "release");
 const publishReleaseDir = resolve(projectRoot, "build-output", "release");
 const sourceExeFileName = `${productName}.exe`;
-const versionedExeFileName = `${productName}_${appVersion}.exe`;
+const versionedExeFileName = `${productName}_${appVersion}-Portable.exe`;
 
 function cleanPublishReleaseDir() {
   rmSync(publishReleaseDir, { recursive: true, force: true });

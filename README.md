@@ -59,7 +59,7 @@ npm run tauri build
 
 构建完成后，发布产物位于：
 
-- 原生发布版可执行文件：[build-output/release/Tick_0.2.0.exe](./build-output/release/Tick_0.2.0.exe)
+- 原生发布版可执行文件：`build-output/release/Tick_<version>-Portable.exe`
 - NSIS 安装包目录：[build-output/release/bundle/nsis](./build-output/release/bundle/nsis)
 - MSI 安装包目录：[build-output/release/bundle/msi](./build-output/release/bundle/msi)
 
@@ -93,9 +93,7 @@ Tick/
 
 ## 版本信息
 
-当前项目版本：
+当前项目版本定义位置：
 
 - 前端包版本：[package.json](./package.json)
 - Tauri 应用版本：[src-tauri/tauri.conf.json](./src-tauri/tauri.conf.json)
-
-两者当前均为 `0.2.0`。
