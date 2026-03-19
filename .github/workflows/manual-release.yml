@@ -2,11 +2,6 @@ name: Manual Release
 
 on:
   workflow_dispatch:
-    inputs:
-      release_notes:
-        description: 更新日志（可选，支持多行）
-        required: false
-        type: string
 
 permissions:
   contents: write
@@ -27,6 +22,12 @@ jobs:
 
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust dependencies
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: |
+            ./src-tauri -> target
 
       - name: Install dependencies
         run: npm ci
@@ -50,25 +51,31 @@ jobs:
         id: release_notes
         shell: pwsh
         run: |
-          $notes = @'
-          ${{ github.event.inputs.release_notes }}
-          '@.Trim()
+          $version = "${{ steps.app_meta.outputs.version }}"
+          $changelogPath = "CHANGELOG.md"
+          if (!(Test-Path $changelogPath)) {
+            throw "Missing changelog file: $changelogPath"
+          }
 
-          $bodyLines = @(
-            "自动构建发布产物：",
-            "- 带版本号的桌面可执行文件",
-            "- NSIS 安装包",
-            "- MSI 安装包"
-          )
+          $content = Get-Content -Path $changelogPath -Raw -Encoding UTF8
+          $normalizedContent = $content.Replace("`r`n", "`n")
+          $escapedVersion = [regex]::Escape($version)
+          $sectionPattern = "(?ms)^##\s*\[?$escapedVersion\]?(?:\s*-\s*[^\n]+)?\s*$\n(?<body>.*?)(?=^##\s|\z)"
+          $releaseBody = ""
 
-          if ($notes) {
-            $bodyLines += ""
-            $bodyLines += "更新日志："
-            $bodyLines += $notes
+          $sectionMatch = [regex]::Match($normalizedContent, $sectionPattern)
+          if ($sectionMatch.Success) {
+            $releaseBody = "## $version`n`n" + $sectionMatch.Groups["body"].Value.Trim()
+          } else {
+            $releaseBody = $normalizedContent.Trim()
+          }
+
+          if ([string]::IsNullOrWhiteSpace($releaseBody)) {
+            throw "CHANGELOG.md is empty."
           }
 
           $bodyPath = Join-Path $env:RUNNER_TEMP "release-body.md"
-          Set-Content -Path $bodyPath -Value ($bodyLines -join [Environment]::NewLine) -Encoding UTF8
+          Set-Content -Path $bodyPath -Value $releaseBody -Encoding UTF8
           "body_path=$bodyPath" >> $env:GITHUB_OUTPUT
 
       - name: Verify release assets
