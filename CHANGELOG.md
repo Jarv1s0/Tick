@@ -14,8 +14,3 @@
 - 支持在计划表中显示日期、任务标记、开机时间和备注列。
 - 支持打印计划表。
 - 支持导出 Excel 文件。
-
-### 发布
-
-- GitHub Release 内容改为直接读取仓库根目录的 `CHANGELOG.md`。
-- 发布工作流已增加 Rust 依赖与 `src-tauri/target` 编译产物缓存，减少 GitHub Actions 重复下载与重复编译时间。
