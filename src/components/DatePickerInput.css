@@ -1,0 +1,107 @@
+.dp-root {
+  position: relative;
+}
+
+.dp-trigger {
+  width: 100%;
+  min-height: 40px;
+  text-align: left;
+  border: 1px solid #cfd7e3;
+  background: #fff;
+  border-radius: 8px;
+}
+
+.dp-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  width: 290px;
+  z-index: 20;
+  border: 1px solid #d9e0ea;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.15);
+  padding: 10px;
+}
+
+.dp-header {
+  display: grid;
+  grid-template-columns: 34px 1fr 34px;
+  align-items: center;
+  gap: 6px;
+}
+
+.dp-header button {
+  padding: 5px 0;
+}
+
+.dp-header-selects {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.dp-header-selects select {
+  border: 1px solid #d1d9e4;
+  border-radius: 6px;
+  padding: 4px 6px;
+  background: #fff;
+}
+
+.dp-week {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  font-size: 12px;
+  color: #64748b;
+  text-align: center;
+}
+
+.dp-grid {
+  margin-top: 6px;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+}
+
+.dp-empty {
+  height: 32px;
+}
+
+.dp-day {
+  height: 32px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  background: #fff;
+  padding: 0;
+}
+
+.dp-day:hover:not(:disabled) {
+  background: #f1f5f9;
+}
+
+.dp-day.is-selected {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}
+
+.dp-day.is-today:not(.is-selected) {
+  border-color: #3b82f6;
+  color: #1d4ed8;
+}
+
+.dp-day:disabled {
+  opacity: 0.35;
+}
+
+.dp-actions {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.dp-actions button {
+  flex: 1;
+}
